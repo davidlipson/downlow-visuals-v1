@@ -3,6 +3,7 @@ import org.openkinect.processing.*;
 import processing.sound.*;
 import java.util.Random;
 import blobDetection.*;
+import processing.video.*;
 
 int nInputs = 4;
 int nVisuals = 8;
@@ -11,6 +12,11 @@ int bands = 32;
 int clock = 0;
 PGraphics currentGraphic;
 String name = "ADVERSARIAL NETWORKS";
+
+// **** THIS IS THE FIELD
+String descriptionText = "THIS PERFORMANCE ....";
+// ****
+
 Kinect kin;
 
 // VISUAL PARENT CLASS
@@ -76,6 +82,7 @@ public class StarField extends Visual {
     Star[] stars;
     Boolean redraw;
     PGraphics og;
+    Boolean startShow;
     
     public StarField(AudioSource[] str, Boolean red){
       super(str);
@@ -86,6 +93,11 @@ public class StarField extends Visual {
       for (int s = 0; s < nStars; s++){
         stars[s] = new Star();
       }
+      startShow = true;
+    }
+    
+    public void reset(){
+      startShow = false;
     }
     
     public void updateGraphic(){
@@ -108,11 +120,12 @@ public class StarField extends Visual {
         og.point(stars[s].x + 10*sin(stars[s].x + clock/100.) + sumOfVols*5, stars[s].y + 10*cos(stars[s].x + clock/100.), stars[s].z);
 
       }
-      if (redraw){
+      if (redraw && startShow){
         og.textAlign(CENTER);
         og.fill((clock % 500)*255/500.);
         og.text(name, width/2, height/2, -clock + (clock % 500));
         og.text("THE SHOW IS ABOUT TO BEGIN", width/2, height/2 + 30, -clock + (clock % 500));
+        og.text(descriptionText, width/2, height/2 + 60, -clock + (clock % 500));
       }
       og.endDraw();
       pg.loadPixels();
@@ -420,7 +433,7 @@ public class GrowingShapes extends Visual {
     }
     
     public void updateFields(){
-      if (sources[0].volume + sources[1].volume + sources[2].volume + sources[3].volume > .4){
+      if (sources[0].volume + sources[1].volume + sources[2].volume + sources[3].volume > 0.3){
         nShapes += direction;
         if(direction == 1 && nShapes == maxShapes){
           direction = -1;
@@ -720,7 +733,7 @@ public class Kinect002 extends KinectParent {
          
           
           if(x % 10 > 3 && clock % 100 < 50){
-            pg.pixels[offset] = blubs.pixels[max(0, x + (y - floor((sources[0].volume + sources[1].volume + sources[2].volume)*100))*width)];
+            pg.pixels[offset] = blubs.pixels[max(0, x + (y - floor((sources[0].volume + sources[1].volume + sources[2].volume)*100))*width)];          
           }
           else{
             pg.pixels[offset] = blubs.pixels[offset];/*blubs.pixels[min(width*height - 1, x + (y + floor(sources[0].volume*100))*width)];*/
@@ -735,7 +748,7 @@ public class Kinect002 extends KinectParent {
     
     public void updateBlubs(){
       PImage img = kinect.getDepthImage();
-      int currentLetter = parseInt(clock/1000.) % lan;
+      int currentLetter = parseInt(clock/10.) % lan;
       blob.computeBlobs(img.pixels);
       blubs.strokeWeight(1);
       Blob b;
@@ -755,7 +768,7 @@ public class Kinect002 extends KinectParent {
                 blubs.textSize(8);
                 e = b.getEdgeVertexA(m);
                 //blubs.text(an.substring(currentPosition, currentPosition + 1), e.x*width, e.y*height, sin(clock)*100);
-                blubs.curveVertex(e.x*width, e.y*height, 0);
+                blubs.curveVertex(e.x*width, e.y*height, sin(clock)*100);
               }
               /*else{
                 pg.fill(155);
@@ -836,7 +849,6 @@ HashMap<String, Integer> inputMap = new HashMap<String, Integer>();
 
 
 void setup(){
-  frameRate(30);
   //size(1000, 1000, P3D);
   fullScreen(P3D, 1);
   smooth();
@@ -897,7 +909,7 @@ void keyReleased() {
     if (currentVisual < 0) currentVisual = nVisuals - 1;
     visuals[currentVisual].reset();
     if(currentVisual == 3){
-      visuals[currentVisual].setLast(visuals[2].pg);
+      visuals[currentVisual].setLast(visuals[4].pg);
     }
   }
 }
