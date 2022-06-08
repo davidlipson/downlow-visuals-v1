@@ -296,7 +296,7 @@ public class LineGeom extends Visual {
       og.square((width - 700)/2 + 400, height/4, 100);
       og.fill(sources[3].volume*2550,sources[2].volume*2550,0);
       og.square((width - 700)/2 + 500, height/4, 100);
-      og.fill(255,0,sources[2].volume*2550);
+      og.fill(2550*sources[0].volume,0,sources[2].volume*2550);
       og.square((width - 700)/2 + 600, height/4, 100);
      
       og.fill(sources[0].volume*2550,0,0);
@@ -311,7 +311,7 @@ public class LineGeom extends Visual {
       og.square((width - 700)/2 + 400, 3*height/4 - 115, 100);
       og.fill(sources[3].volume*2550,sources[2].volume*2550,0);
       og.square((width - 700)/2 + 500, 3*height/4 - 115, 100);
-      og.fill(255,0,sources[2].volume*2550);
+      og.fill(2550*sources[0].volume,0,sources[2].volume*2550);
       og.square((width - 700)/2 + 600, 3*height/4 - 115, 100);
       
       og.line(
@@ -334,7 +334,7 @@ public class LineGeom extends Visual {
       
       for(int x = 0; x < width; x++){
         for(int y = 0; y < height; y++){
-          int offset = (rand.nextInt(10) < 8 ? rand.nextInt(width): x) + (rand.nextInt(10) < 8 ? rand.nextInt(height)*width : y*width);
+          int offset = (rand.nextInt(10) < 2 ? rand.nextInt(width): x) + (rand.nextInt(10) < 2 ? rand.nextInt(height)*width : y*width);
           pg.pixels[offset] = og.pixels[offset];
         }
       }
@@ -433,7 +433,7 @@ public class GrowingShapes extends Visual {
     }
     
     public void updateFields(){
-      if (sources[0].volume + sources[1].volume + sources[2].volume + sources[3].volume > 0.75){
+      if (sources[0].volume + sources[1].volume + sources[2].volume + sources[3].volume > 0.3){
         nShapes += direction;
         if(direction == 1 && nShapes == maxShapes){
           direction = -1;
@@ -733,7 +733,7 @@ public class Kinect002 extends KinectParent {
          
           
           if(x % 10 > 3 && clock % 100 < 50){
-            pg.pixels[offset] = blubs.pixels[max(0, x + (y - floor(sources[0].volume*100))*width)];
+            pg.pixels[offset] = blubs.pixels[max(0, x + (y - floor((sources[0].volume + sources[1].volume + sources[2].volume)*100))*width)];          
           }
           else{
             pg.pixels[offset] = blubs.pixels[offset];/*blubs.pixels[min(width*height - 1, x + (y + floor(sources[0].volume*100))*width)];*/
@@ -849,8 +849,8 @@ HashMap<String, Integer> inputMap = new HashMap<String, Integer>();
 
 
 void setup(){
-  size(1000, 1000, P3D);
-  //fullScreen(P3D, 1);
+  //size(1000, 1000, P3D);
+  fullScreen(P3D, 1);
   smooth();
   kin = new Kinect(this);
   
